@@ -7,7 +7,7 @@
 #include <math.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
-#include "HD44780.h"
+#include "LCD_HD44780.h"
 
 #ifndef _BV
 #define _BV(bit)				(1<<(bit))
@@ -50,10 +50,10 @@
 
 void ADC_init() {
 
-	sbi(ADMUX, REFS0); // ustawianie napiêcia referencyjnego AVCC
+	sbi(ADMUX, REFS0); // ustawianie napiï¿½cia referencyjnego AVCC
 
-	sbi(ADCSRA, ADPS0); // ustawianie podzielnika czêstotliwoœci na 2
-	sbi(ADCSRA, ADEN); // uruchomineie uk³adu przetwornika
+	sbi(ADCSRA, ADPS0); // ustawianie podzielnika czï¿½stotliwoï¿½ci na 2
+	sbi(ADCSRA, ADEN); // uruchomineie ukï¿½adu przetwornika
 }
 
 int convertToVoltage(uint16_t current) {
@@ -68,8 +68,8 @@ uint16_t ADC_10bit() {
 }
 
 int main() {
-	LCD_Initalize();
-	LCD_Home();
+	LCD_HD44780::init();
+	LCD_HD44780::home();
 	char text[20]; // zmienna pomocnicza
 	int votage;
 	ADC_init(); // inicjacja przetwornika A/D
@@ -77,13 +77,15 @@ int main() {
 
 	while (1) {
 		votage = convertToVoltage(ADC_10bit());
-		LCD_Clear(); // czysci wyswietlacz
+		LCD_HD44780::clear();  // czysci wyswietlacz
 
-		LCD_GoTo(0, 0); // przechodzi do pierwszej linijki
-		sprintf(text, "Napiecie: %d", votage); // zapisuje nowy ci¹g znaków do wyœwietlenia
-		LCD_WriteText(text); // wyswietla zadany ci¹g znaków
 
-		LCD_GoTo(0, 1); // przechodzi do pierwszej linijki
+		LCD_HD44780::goTo(0, 0); // przechodzi do pierwszej linijki
+		sprintf(text, "Napiecie: %d", votage); // zapisuje nowy ciï¿½g znakï¿½w do wyï¿½wietlenia
+		LCD_HD44780::writeText(text);  // wyswietla zadany ciï¿½g znakï¿½w
+
+		LCD_HD44780::goTo(0, 1);  // przechodzi do pierwszej linijki
+
 		if (votage > 250) {
 			sprintf(text, "On");
 			sbi(PORTC, 3);
@@ -91,7 +93,7 @@ int main() {
 			sprintf(text, "Off");
 			cbi(PORTC, 3);
 		}
-		LCD_WriteText(text); // wyswietla zadany ci¹g znaków
+		LCD_HD44780::writeText(text); // wyswietla zadany ciï¿½g znakï¿½w
 
 		_delay_ms(1000);
 	}
